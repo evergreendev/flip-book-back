@@ -4,7 +4,7 @@ const User = require("../data/User");
 
 /* GET users listing. */
 router.get('/', async function (req, res, next) {
-  const users = User.findAll();
+  const users = await User.findAll();
 
   res.send(users);
 });
