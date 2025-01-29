@@ -17,5 +17,12 @@ module.exports = {
 
 //expire one hour from now
         return jwt.sign({isAdmin: 'true', exp: Math.floor(Date.now() / 1000) + (60 * 60),}, process.env.JWT_SECRET);
+    },
+    checkClaim: async function (token) {
+        try{
+            return jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err){
+            return false;
+        }
     }
 }
