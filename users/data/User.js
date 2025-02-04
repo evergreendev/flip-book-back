@@ -18,8 +18,13 @@ module.exports = {
     create: async function (user) {
         if (!user || !user.password) return null;
         const passHash = await bcrypt.hash(user.password, 8);
-        const[newUser] = await pool.execute("INSERT INTO users (password,user_name,id) VALUES (?, ?, ?)",[passHash, user.email, uuidv4()]);
+        const userId = uuidv4();
+        const[results] = await pool.execute("INSERT INTO users (password,user_name,id) VALUES (?, ?, ?)",[passHash, user.email, userId]);
 
-        return newUser;
+        if(!results) return null;
+
+        const [newUser] = await pool.execute("SELECT user_name FROM users WHERE id = ?", [userId]);
+
+        return newUser[0];
     }
 }
