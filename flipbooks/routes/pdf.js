@@ -37,7 +37,7 @@ router.delete('/upload', async function (req, res, next) {
     }
 
     unlink(req.body.pathName, (err) => {
-        if (err) res.status(400).send({"message":"Failed to delete file"});
+        if (err) return res.status(400).send({"message":"Failed to delete file"});
 
         return res.status(200).send({"message":"Successfully deleted file"});
     });
