@@ -31,7 +31,7 @@ router.post('/upload', async function (req, res, next) {
 
 })
 
-router.delete('/upload', async function (req, res, next) {
+router.delete('/', async function (req, res, next) {
     if (!req.body.pathName){
         return res.status(400).send({"message":"No path name provided"})
     }
