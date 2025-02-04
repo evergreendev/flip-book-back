@@ -1,0 +1,33 @@
+create table flipbooks
+(
+    id        char(36)     not null
+        primary key,
+    pdf_path  varchar(255) not null,
+    path_name varchar(255) null,
+    status    tinytext     not null,
+    password  varchar(255) null,
+    title     varchar(255) null
+);
+
+create table overlays
+(
+    id          char(36)     not null
+        primary key,
+    flipbook_id char(36)     null,
+    x           float        not null,
+    y           float        not null,
+    w           float        not null,
+    h           float        not null,
+    url         varchar(255) not null,
+    constraint overlays_flipbooks_id_fk
+        foreign key (flipbook_id) references flipbooks (id)
+            on update cascade on delete cascade
+);
+
+create table users
+(
+    id        char(36)     not null
+        primary key,
+    password  varchar(255) not null,
+    user_name varchar(255) null
+);
