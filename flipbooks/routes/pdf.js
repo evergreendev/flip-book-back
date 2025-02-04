@@ -23,7 +23,7 @@ router.post('/upload', async function (req, res, next) {
         writeFile(newPath, rawData, function (err) {
             if (err) console.log(err)
             return res.send({
-                "filePath": newPath,
+                "filePath": file.newFilename+".pdf",
                 "message":"Successfully uploaded"
             })
         });

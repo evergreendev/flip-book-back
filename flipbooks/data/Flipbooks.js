@@ -21,10 +21,25 @@ module.exports = {
             status = "draft";
         }
 
-        const [newFlipbook] = 
-            await pool.execute("INSERT INTO flipbooks (id, pdf_path, path_name, status, password, title) VALUES (?, ?, ?, ?, ?,?)",
-                [uuidv4(), flipbook.pdfPath, flipbook.pathName, status, flipbook.password||null, flipbook.title]);
+        const flipbookId = uuidv4();
 
-        return newFlipbook;
+        const [results] =
+            await pool.execute("INSERT INTO flipbooks (id, pdf_path, path_name, status, password, title) VALUES (?, ?, ?, ?, ?,?)",
+                [flipbookId, flipbook.pdfPath, flipbook.pathName||null, status, flipbook.password||null, flipbook.title||null]);
+
+        if(!results) return null;
+
+        const [newFlipbook] = await pool.execute("SELECT id, pdf_path, path_name, status, title FROM flipbooks WHERE id = ?", [flipbookId]);
+
+        return newFlipbook[0];
+    },
+    delete: async function (id) {
+        if (!id) return null;
+        const [results] =
+            await pool.execute("DELETE FROM flipbooks where id = ?", [id]);
+
+        if(!results) return null;
+
+        return results;
     }
 }
