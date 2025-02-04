@@ -1,6 +1,6 @@
 var express = require('express');
 const {formidable} = require("formidable");
-const { readFileSync, writeFile} = require("node:fs");
+const { readFileSync, writeFile, unlink} = require("node:fs");
 const {join} = require("node:path");
 var router = express.Router();
 
@@ -22,10 +22,25 @@ router.post('/upload', async function (req, res, next) {
 
         writeFile(newPath, rawData, function (err) {
             if (err) console.log(err)
-            return res.send("Successfully uploaded")
+            return res.send({
+                "filePath": newPath,
+                "message":"Successfully uploaded"
+            })
         });
     });
 
+})
+
+router.delete('/upload', async function (req, res, next) {
+    if (!req.body.pathName){
+        return res.status(400).send({"message":"No path name provided"})
+    }
+
+    unlink(req.body.pathName, (err) => {
+        if (err) res.status(400).send({"message":"Failed to delete file"});
+
+        return res.status(200).send({"message":"Successfully deleted file"});
+    });
 })
 
 module.exports = router;
