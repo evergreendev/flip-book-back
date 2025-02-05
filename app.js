@@ -9,7 +9,6 @@ var usersRouter = require('./users/routes/users');
 var sessionRouter = require('./session/routes/session');
 var pdfRouter = require('./flipbooks/routes/pdf');
 const flipbooksRouter = require('./flipbooks/routes/flipbooks');
-var authCheck = require('./session/middleware/authCheck');
 
 var app = express();
 
@@ -22,7 +21,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', usersRouter);
 app.use('/session', sessionRouter);
 app.use('/flipbooks', flipbooksRouter);
-app.use(authCheck);//Every route below needs to be authorized
 app.use('/pdf', pdfRouter);
 
 module.exports = app;

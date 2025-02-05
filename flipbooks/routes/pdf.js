@@ -3,9 +3,10 @@ const {formidable} = require("formidable");
 const { readFileSync, writeFile, unlink} = require("node:fs");
 const {join} = require("node:path");
 var router = express.Router();
+const authCheck = require('../../session/middleware/authCheck');
 
 
-router.post('/upload', async function (req, res, next) {
+router.post('/upload', authCheck, async function (req, res, next) {
     const form = formidable({});
 
     await form.parse(req, (err, fields, files) => {
@@ -31,7 +32,7 @@ router.post('/upload', async function (req, res, next) {
 
 })
 
-router.delete('/', async function (req, res, next) {
+router.delete('/', authCheck, async function (req, res, next) {
     if (!req.body.pathName){
         return res.status(400).send({"message":"No path name provided"})
     }
