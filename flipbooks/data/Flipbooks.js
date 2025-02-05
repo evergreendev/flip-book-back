@@ -7,7 +7,7 @@ module.exports = {
     findById: async function (id) {
         const [flipbooks] = await pool.execute("SELECT * FROM flipbooks where id=?", [id]);
 
-        return flipbooks;
+        return flipbooks[0];
     },
     findAll: async function (showDrafts) {
         if (showDrafts){

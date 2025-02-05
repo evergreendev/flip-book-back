@@ -4,6 +4,14 @@ const Flipbook = require("../data/Flipbooks.js");
 const authCheck = require('../../session/middleware/authCheck');
 
 
+router.get('/:flipbookId', authCheck, async (req, res) => {
+    const flipBook = await Flipbook.findById(req.params.flipbookId)
+
+    if (!flipBook) {return res.status(404).send('Not Found');}
+
+    return res.status(200).send(flipBook);
+})
+
 router.get('/', authCheck, async (req, res) => {
     const flipBooks = await Flipbook.findAll(req.query.showDrafts);
     if (!flipBooks || !flipBooks.length) {return res.status(404).send([]);}
