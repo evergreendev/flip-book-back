@@ -9,10 +9,18 @@ module.exports = {
 
         return flipbooks;
     },
-    findAll: async function () {
-        const [flipbooks] = await pool.execute("SELECT * FROM flipbooks", []);
+    findAll: async function (showDrafts) {
+        if (showDrafts){
+            const [flipbooks] = await pool.execute("SELECT * FROM flipbooks", []);
 
-        return flipbooks;
+            return flipbooks;
+        }
+        else {
+            const [flipbooks] = await pool.execute("SELECT * FROM flipbooks where NOT (status = 'draft')", []);
+
+            return flipbooks;
+        }
+
     },
     create: async function (flipbook) {
         if (!flipbook || !flipbook.pdfPath) return null;

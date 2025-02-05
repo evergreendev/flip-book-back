@@ -4,6 +4,20 @@ const Flipbook = require("../data/Flipbooks.js");
 const authCheck = require('../../session/middleware/authCheck');
 
 
+router.get('/', authCheck, async (req, res) => {
+    const flipBooks = await Flipbook.findAll(req.query.showDrafts);
+    if (!flipBooks || !flipBooks.length) {return res.status(404).send([]);}
+
+    return res.status(200).send(flipBooks);
+})
+
+router.get('/', async (req, res) => {
+    const flipBooks = await Flipbook.findAll(false);
+    if (!flipBooks || !flipBooks.length) {return res.status(404).send([]);}
+
+    return res.status(200).send(flipBooks);
+})
+
 router.post('/', authCheck, async function (req, res, next) {
     const newFlipbook = await Flipbook.create(req.body);
 
