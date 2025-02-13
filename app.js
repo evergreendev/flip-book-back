@@ -8,11 +8,13 @@ var logger = require('morgan');
 var usersRouter = require('./users/routes/users');
 var sessionRouter = require('./session/routes/session');
 var pdfRouter = require('./flipbooks/routes/pdf');
+var cors = require('cors')
 const flipbooksRouter = require('./flipbooks/routes/flipbooks');
 
 var app = express();
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
