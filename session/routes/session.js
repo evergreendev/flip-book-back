@@ -10,4 +10,12 @@ router.post('/', async function (req, res, next) {
     res.send(JSON.stringify({user_token: sessionToken}))
 });
 
+router.get('/validate/:token', async function (req, res, next) {
+    const sessionToken = await Session.checkClaim(req.params.token);
+
+    if (!sessionToken) return res.status(401).send({error: "Expired Token"});
+
+    res.send(JSON.stringify({user_token: sessionToken}))
+})
+
 module.exports = router;
