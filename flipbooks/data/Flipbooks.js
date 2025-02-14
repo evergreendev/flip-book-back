@@ -1,5 +1,6 @@
 const db = require('../../data/database');
 const {v4: uuidv4} = require('uuid');
+const slugify = require("slugify");
 
 const pool = db.getPool();
 
@@ -40,6 +41,22 @@ module.exports = {
         const [newFlipbook] = await pool.execute("SELECT id, pdf_path, path_name, status, title FROM flipbooks WHERE id = ?", [flipbookId]);
 
         return newFlipbook[0];
+    },
+    update: async function (flipbookId, fields) {
+        if (!fields || !flipbookId) return null;
+
+        const [currResults] = await pool.execute("SELECT * FROM flipbooks WHERE id = ?", [flipbookId]);
+        if (!currResults) return null;
+
+        const currFlipbook = currResults[0];
+
+        const title = fields?.title?.[0] || "untitled flipbook";
+        const path = fields?.path?.[0] || slugify(title);
+        const isDraft = fields.isDraft;
+
+        await pool.execute("UPDATE flipbooks SET title=?, path_name=?, status=? WHERE id = ?",[title,path,isDraft ? "draft":"published", flipbookId]);
+
+        return currFlipbook;
     },
     delete: async function (id) {
         if (!id) return null;
