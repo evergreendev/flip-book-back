@@ -5,6 +5,21 @@ const authCheck = require('../../session/middleware/authCheck');
 const {formidable} = require("formidable");
 
 
+router.get('/slug/:slug', async (req, res,next) => {
+    const flipBook = await Flipbook.findBySlug(req.params.slug);
+    if (flipBook.status !== "published") {//If the flipbook isn't published move onto the authorized route to see if the user has access to the draft
+        next();
+    }
+
+    return res.status(200).send(flipBook);
+})
+
+router.get('/slug/:slug', authCheck, async (req, res,next) => {
+    const flipBook = await Flipbook.findBySlug(req.params.slug);
+
+    return res.status(200).send(flipBook);
+})
+
 router.get('/:flipbookId', authCheck, async (req, res) => {
     const flipBook = await Flipbook.findById(req.params.flipbookId)
 

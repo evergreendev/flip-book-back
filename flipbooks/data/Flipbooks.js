@@ -10,6 +10,12 @@ module.exports = {
 
         return flipbooks[0];
     },
+    findBySlug: async function (slug) {
+        console.log(slug)
+        const [flipbooks] = await pool.execute("SELECT * FROM flipbooks where path_name=?", [slug]);
+
+        return flipbooks[0];
+    },
     findAll: async function (showDrafts) {
         if (showDrafts){
             const [flipbooks] = await pool.execute("SELECT * FROM flipbooks", []);
@@ -51,7 +57,7 @@ module.exports = {
         const currFlipbook = currResults[0];
 
         const title = fields?.title?.[0] || "untitled flipbook";
-        const path = fields?.path?.[0] || slugify(title);
+        const path = fields?.path?.[0] || slugify(title,{lower:true});
         const isDraft = fields.isDraft;
 
         await pool.execute("UPDATE flipbooks SET title=?, path_name=?, status=? WHERE id = ?",[title,path,isDraft ? "draft":"published", flipbookId]);
