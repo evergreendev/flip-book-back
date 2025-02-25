@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Flipbook = require("../data/Flipbooks.js");
+const Overlays = require("../data/Overlays.js");
 const authCheck = require('../../session/middleware/authCheck');
 const {formidable} = require("formidable");
 
@@ -75,6 +76,24 @@ router.delete('/', authCheck, async function (req, res, next) {
     if (!deleteSuccessful) {
         return res.status(200)
     }
+})
+
+router.get('/overlays/:flipbookId', async function (req, res) {
+    const overlays = await Overlays.findByFlipbookId(req.params.flipbookId);
+
+    return res.status(200).send(overlays);
+})
+
+router.post('/overlays', authCheck, async function (req, res, next) {
+    if (!req.body) return res.status(400).send({"message":"No document found."});
+
+    const overlay = await Overlays.create(req.body);
+
+    if (!overlay) {
+        return res.status(400).send({"message":"No overlay found."});
+    }
+
+    return res.status(200).send({"overlay": overlay});
 })
 
 module.exports = router;
