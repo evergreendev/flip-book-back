@@ -92,22 +92,9 @@ router.get('/overlays/:flipbookId', async function (req, res) {
 
 router.post('/overlays', authCheck, async function (req, res, next) {
     if (!req.body) return res.status(400).send({"message": "No document found."});
+    const overlay = await Overlays.upsert(req.body.id, req.body);
 
-    if (req.body.id) {
-        const overlay = await Overlays.update(req.body.id, req.body);
-
-        return res.status(200).send({"overlay": overlay});
-    } else {
-        const overlay = await Overlays.create(req.body);
-
-        if (!overlay) {
-            return res.status(400).send({"message": "No overlay found."});
-        }
-
-        return res.status(200).send({"overlay": overlay});
-    }
-
-
+    return res.status(200).send({"overlay": overlay});
 })
 
 router.delete('/overlays/:id', authCheck, async function (req, res, next) {

@@ -29,10 +29,22 @@ module.exports = {
 
         return newOverlay[0];
     },
-    update: async function (overlayId, fields) {
+    upsert: async function (overlayId, fields) {
         const [currResults] = await pool.execute("SELECT * FROM overlays WHERE id = ?", [overlayId]);
         const currOverlay = currResults[0];
-        if (!currOverlay) return null;
+        if (!currOverlay){
+            const overlayId = uuidv4();
+
+            const [results] =
+                await pool.execute("INSERT INTO overlays (id, flipbook_id, x, y, w, h, url, page) VALUES (?, ?, ?, ?, ?,?,?,?)",
+                    [overlayId, fields.flipbook_id, fields.x, fields.y, fields.w, fields.h, fields.url, fields.page]);
+
+            if (!results) return null;
+
+            const [newOverlay] = await pool.execute("SELECT * FROM overlays WHERE id = ?", [overlayId]);
+
+            return newOverlay[0];
+        } 
 
         const query = "UPDATE overlays SET flipbook_id=?, x=?, y=?, w=?, h=?, url=?, page=? WHERE id=?";
         const [results] = await pool.execute(query,
