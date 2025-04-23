@@ -110,4 +110,13 @@ router.post('/overlays', authCheck, async function (req, res, next) {
 
 })
 
+router.delete('/overlays/:id', authCheck, async function (req, res, next) {
+    if (!req.params.id) {
+        return res.status(400).send({"message": "No document found."});
+    }
+    await Overlays.delete(req.params.id);
+
+    return res.status(204).send();
+})
+
 module.exports = router;
