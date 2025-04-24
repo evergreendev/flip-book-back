@@ -80,8 +80,9 @@ router.delete('/:id', authCheck, async function (req, res, next) {
     const deleteSuccessful = await Flipbook.delete(req.params.id);
 
     if (!deleteSuccessful) {
-        return res.status(204).send();
+        return res.status(400).send();
     }
+    return res.status(204).send();
 })
 
 router.get('/overlays/:flipbookId', async function (req, res) {
