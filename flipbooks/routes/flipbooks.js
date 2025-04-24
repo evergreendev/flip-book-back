@@ -9,7 +9,7 @@ const {formidable} = require("formidable");
 router.get('/slug/:slug', async (req, res, next) => {
     const flipBook = await Flipbook.findBySlug(req.params.slug);
     if (flipBook?.status !== "published") {//If the flipbook isn't published move onto the authorized route to see if the user has access to the draft
-        next();
+        return next();
     }
 
     return res.status(200).send(flipBook);
