@@ -73,14 +73,14 @@ router.put('/:flipbookId', authCheck, async function (req, res, next) {
 
 })
 
-router.delete('/', authCheck, async function (req, res, next) {
-    if (!req.body.id) {
+router.delete('/:id', authCheck, async function (req, res, next) {
+    if (!req.params.id) {
         return res.status(400).send({"message": "No document found."});
     }
-    const deleteSuccessful = await Flipbook.delete(req.body.id);
+    const deleteSuccessful = await Flipbook.delete(req.params.id);
 
     if (!deleteSuccessful) {
-        return res.status(200)
+        return res.status(204).send();
     }
 })
 
