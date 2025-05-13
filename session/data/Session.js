@@ -15,13 +15,37 @@ module.exports = {
 
         if (!passwordMatch) return null;
 
-//expire one hour from now
-        return jwt.sign({isAdmin: 'true', exp: Math.floor(Date.now() / 1000) + (60 * 60),}, process.env.JWT_SECRET);
+        // User token expires in one hour
+        const userToken = jwt.sign(
+            {isAdmin: 'true', exp: Math.floor(Date.now() / 1000) + (60 * 15)},
+            process.env.JWT_SECRET
+        );
+
+        // Refresh token expires in 7 days
+        const refreshToken = jwt.sign(
+            {userId: DBUser[0].id, exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7)}, 
+            process.env.JWT_SECRET
+        );
+
+        return { userToken, refreshToken };
     },
     checkClaim: async function (token) {
         try{
             return jwt.verify(token, process.env.JWT_SECRET);
         } catch (err){
+            return false;
+        }
+    },
+    refreshToken: async function (refreshToken) {
+        try {
+            // Create a new user token
+            const userToken = jwt.sign(
+                {isAdmin: 'true', exp: Math.floor(Date.now() / 1000) + (60 * 15)},
+                process.env.JWT_SECRET
+            );
+
+            return { userToken };
+        } catch (err) {
             return false;
         }
     }
