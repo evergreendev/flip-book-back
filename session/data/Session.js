@@ -38,6 +38,10 @@ module.exports = {
     },
     refreshToken: async function (refreshToken) {
         try {
+            const validRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+            if (!validRefreshToken) return false;
+
             // Create a new user token
             const userToken = jwt.sign(
                 {isAdmin: 'true', exp: Math.floor(Date.now() / 1000) + (60 * 15)},
