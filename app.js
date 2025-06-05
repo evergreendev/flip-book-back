@@ -20,6 +20,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/pdfs',express.static(path.join(__dirname, 'uploads')));
+app.use('/thumbnails',express.static(path.join(__dirname, 'uploads/thumbnails')));
 
 app.use('/users', usersRouter);
 app.use('/session', sessionRouter);
