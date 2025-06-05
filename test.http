@@ -1,4 +1,6 @@
 ### GET request to example server
-GET http://localhost:3001/pdf/thumbnail/6d840e5db67a577bee552fe00.pdf
+POST http://localhost:3001/pdf/thumbnail/6d840e5db67a577bee552fe00.pdf
 
 ###
+
+POST https://flipbookbackend.egmrc.com/pdf/thumbnail/f15240ada621ee1a49731f600.pdf

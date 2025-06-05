@@ -74,7 +74,7 @@ function pdfToPngPages(pdfPath, outputFolder, dpi = 150, callback) {
     });
 }
 
-router.get('/thumbnail/:filename', async function (req, res, next) {
+router.post('/thumbnail/:filename', authCheck, async function (req, res, next) {
     const filename = req.params.filename;
     const pdfPath = join(__dirname, "../../uploads", filename);
 
