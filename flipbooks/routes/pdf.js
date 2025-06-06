@@ -75,7 +75,7 @@ router.get('/status/:jobId', async (req, res) => {
     const job = jobs.find(j => j.data.jobId === req.params.jobId);
 
     if (!job) {
-        return res.status(404).json({ status: 'done' });
+        return res.status(200).json({ status: 'done' });
     }
 
     const state = await job.getState(); // e.g., 'waiting'|'active'|'completed'|'failed'
