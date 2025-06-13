@@ -36,7 +36,7 @@ module.exports = {
             status = "draft";
         }
 
-        const flipbookId = uuidv4();
+        const flipbookId = flipbook.pdfPath;
 
         const [results] =
             await pool.execute("INSERT INTO flipbooks (id, pdf_path, path_name, status, password, title) VALUES (?, ?, ?, ?, ?,?)",

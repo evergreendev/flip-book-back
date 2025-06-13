@@ -89,16 +89,4 @@ router.get('/status/:jobId', async (req, res) => {
     return res.json({ status: 'done', files: job.data.files });
 });
 
-router.delete('/', authCheck, async function (req, res, next) {
-    if (!req.body.pathName) {
-        return res.status(400).send({"message": "No path name provided"})
-    }
-
-    unlink(req.body.pathName, (err) => {
-        if (err) return res.status(400).send({"message": "Failed to delete file"});
-
-        return res.status(200).send({"message": "Successfully deleted file"});
-    });
-})
-
 module.exports = router;

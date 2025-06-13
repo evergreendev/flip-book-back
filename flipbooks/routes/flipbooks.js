@@ -4,6 +4,8 @@ const Flipbook = require("../data/Flipbooks.js");
 const Overlays = require("../data/Overlays.js");
 const authCheck = require('../../session/middleware/authCheck');
 const {formidable} = require("formidable");
+const fs = require("fs");
+const {join} = require("node:path");
 
 
 router.get('/slug/:slug', async (req, res, next) => {
@@ -82,7 +84,13 @@ router.delete('/:id', authCheck, async function (req, res, next) {
     if (!deleteSuccessful) {
         return res.status(400).send();
     }
-    return res.status(204).send();
+
+    fs.rm(join(__dirname, '../../uploads', req.params.id),{recursive: true, force: true}, (err) => {
+        console.log(join(__dirname, '../../uploads', req.params.id));
+        if (err) return res.status(400).send({"message": "Failed to delete file"});
+
+        return res.status(204).send({"message": "Successfully deleted folder"});
+    });
 })
 
 router.get('/overlays/:flipbookId', async function (req, res) {
