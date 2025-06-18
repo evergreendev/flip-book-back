@@ -18,12 +18,11 @@ conversionQueue.process(async (job, done) => {
         const uploadDir = path.join(__dirname, 'uploads', jobId);
         const outputPrefix = path.join(uploadDir, 'page');
 
-        // Spawn pdftoppm to render PNGs
-        const converter = spawn('pdftoppm', [
-            '-png',
-            '-r', '160',
+        // Spawn pdftocairo to render SVGs
+        const converter = spawn('pdf2svg', [
             pdfPath,
-            outputPrefix
+            outputPrefix+'-%d.svg',
+            "all"
         ]);
 
         let stderr = '';
@@ -34,7 +33,7 @@ conversionQueue.process(async (job, done) => {
         converter.on('close', async (code) => {
             if (code !== 0) {
                 // Tell Bull the job failed (stores failure reason in Redis)
-                return done(new Error(stderr || `pdftoppm exited with code ${code}`));
+                return done(new Error(stderr || `pdftocairo exited with code ${code}`));
             }
 
             // On success, gather all the generated PNGs
