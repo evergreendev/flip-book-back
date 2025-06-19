@@ -21,8 +21,8 @@ conversionQueue.process(async (job, done) => {
         // Spawn pdftoppm to render PNGs
         const converter = spawn('pdftoppm', [
             '-png',
-            '-rx', '300',
-            '-ry', '300',
+            '-rx', '200',
+            '-ry', '200',
             pdfPath,
             outputPrefix
         ]);
