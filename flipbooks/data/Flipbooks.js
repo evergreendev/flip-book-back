@@ -55,14 +55,27 @@ module.exports = {
         if (!currResults) return null;
 
         const currFlipbook = currResults[0];
+        const shouldUpdatePublishedDate = currFlipbook.status === "draft" && !fields?.isDraft;
 
-        const title = fields?.title?.[0] || "untitled flipbook";
-        const path = fields?.path?.[0] || slugify(title,{lower:true});
-        const isDraft = fields.isDraft;
+        const title = fields?.title?.[0] || currFlipbook.title || "untitled flipbook";
+        const path = fields?.path?.[0] || slugify(title, {lower: true});
+        const isDraft = fields?.isDraft;
 
-        await pool.execute("UPDATE flipbooks SET title=?, path_name=?, status=? WHERE id = ?",[title,path,isDraft ? "draft":"published", flipbookId]);
+        await pool.execute("UPDATE flipbooks SET title=?, path_name=?, status=?, published_at=? WHERE id = ?",
+            [title, path, isDraft ? "draft" : "published", shouldUpdatePublishedDate ? new Date() : currFlipbook.published_at, flipbookId]);
 
         return currFlipbook;
+    },
+    updateThumbnail: async function (flipbookId, thumbnailPath) {
+      if (!thumbnailPath || !flipbookId) return false;
+
+      try {
+          await pool.execute("UPDATE flipbooks SET cover_path=? WHERE id = ?",[thumbnailPath, flipbookId]);
+          return true;
+      } catch (e) {
+          console.log(e);
+          return false;
+      }
     },
     delete: async function (id) {
         if (!id) return null;

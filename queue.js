@@ -3,6 +3,7 @@ const Queue = require('bull');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
+const Flipbook = require("./flipbooks/data/Flipbooks.js");
 
 // 1) Create (or connect to) your Bull queue
 //    “pdf‐to‐png” is an arbitrary name; Bull will use this to form Redis keys.
@@ -44,6 +45,8 @@ conversionQueue.process(async (job, done) => {
                 .filter(f => f.endsWith('.png'))
                 .map(f => path.join(uploadDir, f))
                 .sort();
+
+            await Flipbook.updateThumbnail(jobId, pngFiles[0].split('/').slice(-2).join('/'));
 
             // Update job data so your “status” endpoint can see the file list
             await job.update({ ...job.data, files: pngFiles });
