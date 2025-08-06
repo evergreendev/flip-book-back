@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var usersRouter = require('./users/routes/users');
-var sessionRouter = require('./session/routes/session');
+var authRouter = require('./auth/routes/auth');
 var pdfRouter = require('./flipbooks/routes/pdf');
 var cors = require('cors')
 const flipbooksRouter = require('./flipbooks/routes/flipbooks');
@@ -23,7 +23,7 @@ app.use('/pdfs',express.static(path.join(__dirname, 'uploads')));
 app.use('/thumbnails',express.static(path.join(__dirname, 'uploads/thumbnails')));
 
 app.use('/users', usersRouter);
-app.use('/session', sessionRouter);
+app.use('/auth', authRouter);
 app.use('/flipbooks', flipbooksRouter);
 app.use('/pdf', pdfRouter);
 

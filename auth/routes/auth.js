@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var Session = require('../data/Session');
+var Auth = require('../data/Auth');
 
 router.post('/', async function (req, res, next) {
-    const tokens = await Session.create(req.body);
+    const tokens = await Auth.create(req.body);
 
     if (!tokens) return res.status(401).send({error: "Invalid Login"});
 
@@ -14,7 +14,7 @@ router.post('/', async function (req, res, next) {
 });
 
 router.post('/validate', async function (req, res, next) {
-    const sessionToken = await Session.checkClaim(req.body.token);
+    const sessionToken = await Auth.checkClaim(req.body.token);
 
     if (!sessionToken) return res.status(401).send({error: "Expired Token"});
 
@@ -22,7 +22,7 @@ router.post('/validate', async function (req, res, next) {
 });
 
 router.post('/refresh', async function (req, res, next) {
-    const tokens = await Session.refreshToken(req.body.refresh_token);
+    const tokens = await Auth.refreshToken(req.body.refresh_token);
 
 
     if (!tokens) return res.status(401).send({error: "Invalid or Expired Refresh Token"});

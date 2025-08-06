@@ -1,4 +1,4 @@
-const Session = require("../data/Session");
+const Auth = require("../data/Auth");
 
 async function isAuthorized(req, res, next) {
     if (!req.headers.authorization) return false;
@@ -7,7 +7,7 @@ async function isAuthorized(req, res, next) {
 
     if (!token) return res.status(401).send('Unauthorized');
 
-    const tokenIsValid = await Session.checkClaim(token);
+    const tokenIsValid = await Auth.checkClaim(token);
 
     if (!tokenIsValid) return res.status(401).send('Unauthorized');
 

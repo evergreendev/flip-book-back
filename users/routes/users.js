@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const User = require("../data/User");
-var authCheck = require('../../session/middleware/authCheck');
+var authCheck = require('../../auth/middleware/authCheck');
 
 /* GET users listing. */
 router.get('/', async function (req, res) {

@@ -7,7 +7,7 @@ const fs = require('fs');
 const {readFileSync, writeFile, unlink} = require("node:fs");
 const {join} = require("node:path");
 var router = express.Router();
-const authCheck = require('../../session/middleware/authCheck');
+const authCheck = require('../../auth/middleware/authCheck');
 const conversionQueue = require("../../queue");
 
 
