@@ -1,13 +1,55 @@
+create table events
+(
+    id          char(36)                           not null
+        primary key,
+    event_type  varchar(32)                        not null,
+    flipbook_id varchar(64)                        null,
+    page_number int                                null,
+    session_id  varchar(64)                        null,
+    user_id     varchar(64)                        null,
+    timestamp   datetime default CURRENT_TIMESTAMP null
+);
+
+create index idx_event_type
+    on events (event_type);
+
+create index idx_flipbook_page
+    on events (flipbook_id, page_number);
+
+create index idx_session_time
+    on events (session_id, timestamp);
+
 create table flipbooks
 (
-    id        char(36)     not null
+    id           char(36)                           not null
         primary key,
-    pdf_path  varchar(255) not null,
-    path_name varchar(255) null,
-    status    tinytext     not null,
-    password  varchar(255) null,
-    title     varchar(255) null
+    pdf_path     varchar(255)                       not null,
+    path_name    varchar(255)                       null,
+    status       tinytext                           not null,
+    password     varchar(255)                       null,
+    title        varchar(255)                       null,
+    cover_path   varchar(255)                       null,
+    published_at datetime                           null,
+    created_at   datetime default CURRENT_TIMESTAMP null,
+    updated_at   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
+
+create table impression_events
+(
+    event_id        char(36)    not null
+        primary key,
+    impression_type varchar(32) not null,
+    overlay_id      varchar(64) null,
+    constraint impression_events_ibfk_1
+        foreign key (event_id) references events (id)
+            on delete cascade
+);
+
+create index idx_ad
+    on impression_events (overlay_id);
+
+create index idx_impression_type
+    on impression_events (impression_type);
 
 create table overlays
 (
@@ -19,10 +61,66 @@ create table overlays
     w           float        not null,
     h           float        not null,
     url         varchar(255) not null,
+    page        int          not null,
+    constraint overlays_pk
+        unique (id),
     constraint overlays_flipbooks_id_fk
         foreign key (flipbook_id) references flipbooks (id)
             on update cascade on delete cascade
 );
+
+create table click_events
+(
+    event_id   char(36)    not null
+        primary key,
+    click_type varchar(32) not null,
+    href       text        null,
+    overlay_id varchar(64) null,
+    constraint click_events_ibfk_1
+        foreign key (event_id) references events (id)
+            on delete cascade,
+    constraint click_events_overlay___fk
+        foreign key (overlay_id) references overlays (id)
+);
+
+create index idx_ad_click
+    on click_events (overlay_id);
+
+create index idx_click_type
+    on click_events (click_type);
+
+create index idx_href
+    on click_events (href(255));
+
+create table read_events
+(
+    event_id         char(36)   not null
+        primary key,
+    duration_seconds int        null,
+    completed        tinyint(1) null,
+    constraint read_events_ibfk_1
+        foreign key (event_id) references events (id)
+            on delete cascade
+);
+
+create index idx_duration
+    on read_events (duration_seconds);
+
+create table sessions
+(
+    id         char(36)    not null
+        primary key,
+    user_id    varchar(64) null,
+    ip_address varchar(45) null,
+    user_agent text        null,
+    referrer   text        null,
+    started_at datetime    null,
+    ended_at   datetime    null,
+    last_seen  datetime    null
+);
+
+create index idx_user_time
+    on sessions (user_id, started_at);
 
 create table users
 (

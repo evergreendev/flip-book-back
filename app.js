@@ -1,17 +1,20 @@
 require('dotenv').config();
 
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var usersRouter = require('./users/routes/users');
-var authRouter = require('./auth/routes/auth');
-var pdfRouter = require('./flipbooks/routes/pdf');
-var cors = require('cors')
+const usersRouter = require('./users/routes/users');
+const authRouter = require('./auth/routes/auth');
+const sessionRouter = require('./sessions/routes/sessions');
+const pdfRouter = require('./flipbooks/routes/pdf');
+const cors = require('cors');
 const flipbooksRouter = require('./flipbooks/routes/flipbooks');
 
-var app = express();
+const app = express();
+
+app.set('trust proxy', true);
 
 app.use(logger('dev'));
 app.use(cors());
@@ -24,6 +27,7 @@ app.use('/thumbnails',express.static(path.join(__dirname, 'uploads/thumbnails'))
 
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
+app.use('/session', sessionRouter);
 app.use('/flipbooks', flipbooksRouter);
 app.use('/pdf', pdfRouter);
 
