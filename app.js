@@ -11,6 +11,7 @@ const sessionRouter = require('./sessions/routes/sessions');
 const pdfRouter = require('./flipbooks/routes/pdf');
 const cors = require('cors');
 const flipbooksRouter = require('./flipbooks/routes/flipbooks');
+const eventsRouter = require('./events/routes/events');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/session', sessionRouter);
 app.use('/flipbooks', flipbooksRouter);
+app.use('/analytics/events', eventsRouter);
 app.use('/pdf', pdfRouter);
 
 module.exports = app;
