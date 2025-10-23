@@ -26,5 +26,13 @@ module.exports = {
         const [newSession] = await pool.execute("SELECT id, user_id, ip_address, user_agent, referrer, started_at, ended_at FROM sessions WHERE id = ?", [sessionId]);
 
         return newSession[0];
+    },
+    heartbeat: async function (sessionId) {
+        const [results] = await pool.execute(
+            "UPDATE sessions SET last_seen = ? WHERE id = ?", [new Date(), sessionId]);
+
+        if (!results) return null;
+
+        return results[0];
     }
 }

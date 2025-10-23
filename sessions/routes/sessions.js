@@ -26,4 +26,16 @@ router.post('/', async function (req, res, next) {
     res.status(200).send(JSON.stringify(session.id));
 })
 
+router.post('/heartbeat', async function (req, res, next) {
+    const sessionId = req.body.sessionId;
+
+    if(!sessionId){
+        return res.status(400).send({"message": "Missing required fields."});
+    }
+
+    await Session.heartbeat(sessionId);
+
+    res.status(200).send();
+})
+
 module.exports = router;
