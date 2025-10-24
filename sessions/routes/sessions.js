@@ -26,6 +26,12 @@ router.post('/', async function (req, res, next) {
     res.status(200).send(JSON.stringify(session.id));
 })
 
+router.post('/cron/end', async function (req, res, next) {
+    await Session.cronEndSessions();
+
+    res.status(200).send();
+})
+
 router.post('/heartbeat', async function (req, res, next) {
     const sessionId = req.body.sessionId;
 
@@ -33,9 +39,10 @@ router.post('/heartbeat', async function (req, res, next) {
         return res.status(400).send({"message": "Missing required fields."});
     }
 
-    await Session.heartbeat(sessionId);
+    const session = await Session.heartbeat(sessionId);
 
-    res.status(200).send();
+
+    res.status(200).send({session});
 })
 
 module.exports = router;
