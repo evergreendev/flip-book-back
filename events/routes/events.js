@@ -1,6 +1,7 @@
 var express = require('express');
 const Event = require("../data/Event");
 const Impression = require("../data/Impression");
+const Click = require("../data/Click");
 var router = express.Router();
 
 router.get('/', function (req, res) {
@@ -43,5 +44,24 @@ router.post('/impression', async function(req, res,next){
         return res.status(500).send({ message: 'Failed to create impression event.' });
     }
 })
+
+router.post('/click', async function(req, res, next){
+    try {
+        const clickType = req.body.clickType || null;
+        const href = req.body.href || null;
+        const overlayId = req.body?.overlayId || null;
+        const eventId = req.body?.eventId || null;
+
+        if (!eventId && !overlayId) {
+            return res.status(400).send({"message": "Missing required fields."});
+        }
+
+        const click = await Click.create(eventId, clickType, overlayId, href);
+        return res.status(200).send({ click });
+
+    } catch (err) {
+
+    }
+});
 
 module.exports = router;
