@@ -4,14 +4,17 @@ const {v4: uuidv4} = require('uuid');
 const pool = db.getPool();
 
 module.exports = {
-    /*    findById: async function (id) {
-            const [sessions] = await pool.execute("SELECT 'id','session_name' FROM sessions where id=?", [id]);
+    findById: async function (id) {
+        const [sessions] = await pool.execute("SELECT id, state FROM sessions where id=?", [id]);
 
-            return sessions;
-        },*/
+        return sessions;
+    },
     cronEndSessions: async function () {
         const [results] = await pool.execute(
             "UPDATE sessions SET ended_at = NOW(), state = 'ended', closed_reason = 'cron' WHERE ended_at IS NULL AND last_seen > DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR ended_at IS NULL"
+            , [new Date()]);
+
+        await pool.execute("UPDATE read_sessions SET ended_at = NOW(), state = 'ended', closed_reason = 'cron' WHERE ended_at IS NULL AND last_seen > DATE_SUB(NOW(), INTERVAL 15 MINUTE) OR ended_at IS NULL"
             , [new Date()]);
     },
     findAll: async function () {
@@ -31,9 +34,11 @@ module.exports = {
 
         return newSession[0];
     },
-    heartbeat: async function (sessionId) {
-        await pool.execute(
-            "UPDATE sessions SET last_seen = ? WHERE id = ?", [new Date(), sessionId]);
+    heartbeat: async function (sessionId, updateLastSeen) {
+        if (updateLastSeen) {
+            await pool.execute(
+                "UPDATE sessions SET last_seen = ? WHERE id = ?", [new Date(), sessionId]);
+        }
 
         const [results] = await pool.execute("SELECT id, user_id, state, ended_at, started_at, last_seen, closed_reason FROM sessions WHERE id = ?", [sessionId]);
 

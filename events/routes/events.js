@@ -2,6 +2,8 @@ var express = require('express');
 const Event = require("../data/Event");
 const Impression = require("../data/Impression");
 const Click = require("../data/Click");
+const ReadSession = require("../data/ReadSession");
+const Session = require("../../sessions/data/Session");
 var router = express.Router();
 
 router.get('/', function (req, res) {
@@ -63,5 +65,34 @@ router.post('/click', async function(req, res, next){
 
     }
 });
+
+router.post('/read-session', async function(req, res, next){
+    try {
+        const sessionId = req.body.sessionId || null;
+
+        if(!sessionId){
+            return res.status(400).send({"message": "Missing required fields."});
+        }
+
+        const readSession = await ReadSession.create(sessionId);
+        return res.status(200).send({ readSession });
+
+    }catch (e) {
+
+    }
+})
+
+router.post('/read-session/heartbeat', async function (req, res, next) {
+    const id = req.body.id;
+    const updateLastSeen = req.body.updateLastSeen || false;
+
+    if(!id){
+        return res.status(400).send({"message": "Missing required fields."});
+    }
+
+    const session = await ReadSession.heartbeat(id, updateLastSeen);
+
+    res.status(200).send({session});
+})
 
 module.exports = router;

@@ -10,6 +10,17 @@ router.get('/', async function (req, res) {
     res.send(sessions);
 });
 
+router.get('/:id', async function (req, res) {
+    const session = await Session.findById(req.params.id);
+
+    if (!session) {
+        return res.status(404).send({message: "Session not found"});
+    }
+
+    res.send(session);
+});
+
+
 router.post('/', async function (req, res, next) {
   /*  const sessions = await Session.findAll();
 
@@ -34,13 +45,13 @@ router.post('/cron/end', async function (req, res, next) {
 
 router.post('/heartbeat', async function (req, res, next) {
     const sessionId = req.body.sessionId;
+    const updateLastSeen = req.body.updateLastSeen || false;
 
     if(!sessionId){
         return res.status(400).send({"message": "Missing required fields."});
     }
 
-    const session = await Session.heartbeat(sessionId);
-
+    const session = await Session.heartbeat(sessionId, updateLastSeen);
 
     res.status(200).send({session});
 })

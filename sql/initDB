@@ -96,15 +96,16 @@ create table read_events
 (
     event_id         char(36)   not null
         primary key,
-    duration_seconds int        null,
+    duration int        null,
     completed        tinyint(1) null,
+    read_session_id  char(36)   null,
     constraint read_events_ibfk_1
         foreign key (event_id) references events (id)
             on delete cascade
 );
 
 create index idx_duration
-    on read_events (duration_seconds);
+    on read_events (duration);
 
 create table sessions
 (
@@ -121,6 +122,20 @@ create table sessions
     closed_reason varchar(255)                  null
 );
 
+create table read_sessions
+(
+    id            char(36)     not null
+        primary key,
+    session_id    char(36)     null,
+    started_at    datetime     null,
+    ended_at      datetime     null,
+    last_seen     datetime     null,
+    state         varchar(255) null,
+    closed_reason varchar(255) null,
+    constraint read_sessions_sessions_id_fk
+        foreign key (session_id) references sessions (id)
+);
+
 create index idx_user_time
     on sessions (user_id, started_at);
 
@@ -131,3 +146,4 @@ create table users
     password  varchar(255) not null,
     user_name varchar(255) null
 );
+
