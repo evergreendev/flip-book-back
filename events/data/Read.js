@@ -15,10 +15,15 @@ module.exports = {
     },
 
     // Creates a read_event tied to an existing event id
-    create: async function (eventId, duration, readSessionId) {
+    create: async function (eventId, readSession, idempotencyKey, ms, seq, ts_ms) {
+
+
         const [results] = await pool.execute(
-            "INSERT INTO flipbook.read_events (event_id, duration, completed, read_session_id) VALUES (?, ?, ?, ?)",
-            [eventId, duration, false, readSessionId]
+            `INSERT INTO read_events (event_id, completed, read_session_id, idempotency_key, ms, seq, ts_ms,
+                                      received_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+             ON DUPLICATE KEY UPDATE idempotency_key = idempotency_key`,
+            [eventId, 1, readSession, idempotencyKey, ms, seq, ts_ms]
         );
 
         if (!results) return null;

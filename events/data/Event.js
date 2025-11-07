@@ -26,29 +26,4 @@ module.exports = {
 
         return newEvent[0];
     },
-    /*Move these to their own files*/
-/*    createClick: async function (eventId, click_type, href, overlay_id) {
-        const [results] = await pool.execute(
-            "INSERT INTO click_events (event_id, click_type, href, overlay_id) VALUES (?, ?, ?,?)"
-            , [eventId, click_type, href, overlay_id]);
-
-        if (!results) return null;
-
-        const [newEvent] = await pool.execute(
-            "SELECT 'event_id','click_type','href','overlay_id' FROM click_events where event_id=?", [eventId]);
-
-        return newEvent[0];
-    },
-    createRead: async function (eventId, durationSeconds, completed) {
-        const [results] = await pool.execute(
-            "INSERT INTO read_events (event_id, duration_seconds, completed) VALUES (?, ?, ?)"
-            , [eventId, durationSeconds, completed]);
-
-        if (!results) return null;
-
-        const [newEvent] = await pool.execute(
-            "SELECT 'event_id','duration_seconds','completed' FROM read_events where event_id=?", [eventId]);
-
-        return newEvent[0];
-    }*/
 }

@@ -94,18 +94,21 @@ create index idx_href
 
 create table read_events
 (
-    event_id         char(36)   not null
+    event_id        char(36)                  not null
         primary key,
-    duration int        null,
-    completed        tinyint(1) null,
-    read_session_id  char(36)   null,
+    completed       tinyint(1)                null,
+    read_session_id char(36)                  null,
+    idempotency_key varbinary(128)            not null,
+    ms              int unsigned              not null,
+    seq             int unsigned              not null,
+    ts_ms           bigint unsigned           not null,
+    received_at     timestamp default (now()) not null,
+    constraint idempotency_key
+        unique (idempotency_key),
     constraint read_events_ibfk_1
         foreign key (event_id) references events (id)
             on delete cascade
 );
-
-create index idx_duration
-    on read_events (duration);
 
 create table sessions
 (
