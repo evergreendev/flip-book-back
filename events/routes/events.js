@@ -115,8 +115,6 @@ router.get('/read/:flipbookId', async function (req, res) {
 
     const reads = await Read.findByFlipbookId(id);
 
-    console.log(reads);
-
     res.status(200).send(reads);
 })
 
