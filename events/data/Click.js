@@ -9,6 +9,18 @@ module.exports = {
         return rows;
     },
 
+    findByFlipbookId: async function (flipbookId, clickType) {
+        const [rows] = await pool.execute(
+            `SELECT ce.*, e.*
+             FROM click_events ce
+                      JOIN events e ON ce.event_id = e.id
+             WHERE e.flipbook_id = ? ${clickType ? 'AND e.type = ?' : ''}`,
+            clickType ? [flipbookId, clickType] : [flipbookId]
+        );
+
+        return Object.groupBy(rows, row => row["href"]);
+    },
+
     // Returns all impression event rows
     findAll: async function () {
         const [rows] = await pool.execute("SELECT * FROM click_events", []);
