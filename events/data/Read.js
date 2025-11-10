@@ -8,6 +8,19 @@ module.exports = {
         return rows;
     },
 
+    findByFlipbookId: async function (flipbookId) {
+        const [rows] = await pool.execute(
+            `SELECT re.*, rs.*, e.*
+             FROM read_events re
+                      JOIN read_sessions rs ON re.read_session_id = rs.id
+                      JOIN events e ON re.event_id = e.id
+             WHERE e.flipbook_id = ?`,
+            [flipbookId]
+        );
+
+        return Object.groupBy(rows, row => row["read_session_id"]);
+    },
+
     // Returns all read event rows
     findAll: async function () {
         const [rows] = await pool.execute("SELECT * FROM read_events", []);

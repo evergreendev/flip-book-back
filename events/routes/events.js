@@ -110,4 +110,14 @@ router.post('/read', async function (req, res) {
     res.status(200).send({message: "read"})
 })
 
+router.get('/read/:flipbookId', async function (req, res) {
+    const id = req.params.flipbookId;
+
+    const reads = await Read.findByFlipbookId(id);
+
+    console.log(reads);
+
+    res.status(200).send(reads);
+})
+
 module.exports = router;
