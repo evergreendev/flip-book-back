@@ -21,6 +21,19 @@ module.exports = {
         return rows;
     },
 
+    findOverlayImpressionByFlipbookId: async function (flipbookId) {
+        const [rows] = await pool.execute(
+            `SELECT ie.*, e.*, o.*
+             FROM impression_events ie
+                      JOIN events e ON ie.event_id = e.id
+                      JOIN overlays o ON ie.overlay_id = o.id
+             WHERE e.flipbook_id = ?
+               AND ie.impression_type = 'overlay'`,
+            [flipbookId]
+        );
+
+        return rows;
+    },
     // Returns all impression event rows
     findAll: async function () {
         const [rows] = await pool.execute("SELECT * FROM impression_events", []);

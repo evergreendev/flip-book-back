@@ -120,8 +120,9 @@ router.get('/read/:flipbookId', async function (req, res) {
 
 router.get('/impression/:flipbookId', async function (req, res) {
     const id = req.params.flipbookId;
+    const impressionType = req.query["impression_type"] || null;
 
-    const impressions = await Impression.findByFlipbookId(id);
+    const impressions = impressionType === "overlay" ? await Impression.findOverlayImpressionByFlipbookId(id, impressionType) : await Impression.findByFlipbookId(id);
 
     res.status(200).send(impressions);
 })
