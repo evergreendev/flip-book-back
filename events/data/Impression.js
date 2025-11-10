@@ -9,6 +9,18 @@ module.exports = {
         return rows;
     },
 
+    findByFlipbookId: async function (flipbookId, impressionType) {
+        const [rows] = await pool.execute(
+            `SELECT ie.*, e.*
+             FROM impression_events ie
+                      JOIN events e ON ie.event_id = e.id
+             WHERE e.flipbook_id = ? ${impressionType ? 'AND e.type = ?' : ''}`,
+            impressionType ? [flipbookId, impressionType] : [flipbookId]
+        );
+
+        return rows;
+    },
+
     // Returns all impression event rows
     findAll: async function () {
         const [rows] = await pool.execute("SELECT * FROM impression_events", []);

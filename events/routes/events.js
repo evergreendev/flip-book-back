@@ -118,4 +118,12 @@ router.get('/read/:flipbookId', async function (req, res) {
     res.status(200).send(reads);
 })
 
+router.get('/impression/:flipbookId', async function (req, res) {
+    const id = req.params.flipbookId;
+
+    const impressions = await Impression.findByFlipbookId(id);
+
+    res.status(200).send(impressions);
+})
+
 module.exports = router;
