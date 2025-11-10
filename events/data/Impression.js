@@ -14,7 +14,7 @@ module.exports = {
             `SELECT ie.*, e.*
              FROM impression_events ie
                       JOIN events e ON ie.event_id = e.id
-             WHERE e.flipbook_id = ? ${impressionType ? 'AND e.type = ?' : ''}`,
+             WHERE e.flipbook_id = ? ${impressionType ? 'AND ie.impression_type = ?' : ''}`,
             impressionType ? [flipbookId, impressionType] : [flipbookId]
         );
 
