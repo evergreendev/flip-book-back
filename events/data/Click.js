@@ -14,7 +14,7 @@ module.exports = {
             `SELECT ce.*, e.*
              FROM click_events ce
                       JOIN events e ON ce.event_id = e.id
-             WHERE e.flipbook_id = ? ${clickType ? 'AND e.type = ?' : ''}`,
+             WHERE e.flipbook_id = ? AND e.event_type = 'click' ${clickType ? 'AND e.click_type = ?' : ''}`,
             clickType ? [flipbookId, clickType] : [flipbookId]
         );
 
