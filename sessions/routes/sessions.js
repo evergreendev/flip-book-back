@@ -32,11 +32,7 @@ router.post('/', async function (req, res, next) {
     const userAgent = req.headers['user-agent'];
     const referrer = req.headers.referer || req.headers.referrer || '';
 
-    console.log(clientIp, userAgent, referrer);
-
     const session = await Session.create(clientIp, userAgent, referrer);
-
-    console.log(session);
 
     res.status(200).send(JSON.stringify(session.id));
 })
