@@ -47,17 +47,17 @@ module.exports = {
         } 
 
         const query = "UPDATE overlays SET flipbook_id=?, x=?, y=?, w=?, h=?, url=?, page=? WHERE id=?";
-        const [results] = await pool.execute(query,
-            [
-                fields?.["flipbook_id"] || currOverlay["flipbook_id"],
-                fields?.["x"] || currOverlay["x"],
-                fields?.["y"] || currOverlay["y"],
-                fields?.["w"] || currOverlay["w"],
-                fields?.["h"] || currOverlay["h"],
-                fields?.["url"] || currOverlay["url"],
-                fields?.["page"] || currOverlay["page"],
-                overlayId
-            ]);
+
+        const [results] = await pool.execute(query, [
+            fields?.flipbook_id ?? currOverlay.flipbook_id,
+            fields?.x ?? currOverlay.x,
+            fields?.y ?? currOverlay.y,
+            fields?.w ?? currOverlay.w,
+            fields?.h ?? currOverlay.h,
+            fields?.url ?? currOverlay.url,
+            fields?.page ?? currOverlay.page,
+            overlayId
+        ])
 
         return results[0];
     },
