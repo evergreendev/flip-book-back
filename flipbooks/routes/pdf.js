@@ -13,7 +13,9 @@ const conversionQueue = require("../../queue");
 
 router.post('/upload', authCheck, async function (req, res, next) {
     const form = formidable({
-        keepExtensions: true
+        keepExtensions: true,
+        maxFileSize: 1024 * 1024 * 1024, // 1GB
+        maxTotalFileSize: 1024 * 1024 * 1024 // 1GB
     });
 
     await form.parse(req, (err, fields, files) => {
@@ -87,6 +89,23 @@ router.get('/status/:jobId', async (req, res) => {
     }
     // state === 'completed'
     return res.json({ status: 'done', files: job.data.files });
+});
+
+router.get('/count/:id', async (req, res) => {
+    const id = req.params.id;
+    const directoryPath = path.join(__dirname, '../../uploads', id);
+
+    fs.readdir(directoryPath, (err, files) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                return res.status(404).json({ error: 'Directory not found' });
+            }
+            return res.status(500).json({ error: 'Failed to read directory' });
+        }
+
+        const count = files.length;
+        res.json({ count: count - 1 });
+    });
 });
 
 module.exports = router;

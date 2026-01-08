@@ -60,7 +60,10 @@ router.post('/', authCheck, async function (req, res, next) {
 })
 
 router.put('/:flipbookId', authCheck, async function (req, res, next) {
-    const form = formidable({});
+    const form = formidable({
+        maxFileSize: 1024 * 1024 * 1024, // 1GB
+        maxTotalFileSize: 1024 * 1024 * 1024 // 1GB
+    });
 
     await form.parse(req, async (err, fields, files) => {
         if (err) {
