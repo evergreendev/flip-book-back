@@ -16,15 +16,27 @@ module.exports = {
 
         return flipbooks[0];
     },
-    findAll: async function (showDrafts) {
-        if (showDrafts){
-            const [flipbooks] = await pool.execute("SELECT * FROM flipbooks", []);
+    findAll: async function (showDrafts, page, limit, offset, orderBy, orderDirection) {
+        const validOrderColumns = ['id', 'pdf_path', 'path_name', 'status', 'password', 'title', 'cover_path', 'published_at', 'created_at', 'updated_at'];
+        const validOrderDirections = ['ASC', 'DESC'];
+
+        const safeOrderBy = validOrderColumns.includes(orderBy) ? orderBy : 'created_at';
+        const safeOrderDirection = validOrderDirections.includes(orderDirection.toUpperCase()) ? orderDirection.toUpperCase() : 'DESC';
+
+        if (showDrafts) {
+            const [flipbooks] = await pool.query(
+                `SELECT * FROM flipbooks
+                    ORDER BY ${safeOrderBy} ${safeOrderDirection}
+                    LIMIT ? OFFSET ?`
+                , [limit, offset]);
 
             return flipbooks;
-        }
-        else {
-            const [flipbooks] = await pool.execute("SELECT * FROM flipbooks where NOT (status = 'draft')", []);
-
+        } else {
+            const [flipbooks] = await pool.query(
+                `SELECT * FROM flipbooks where NOT (status = 'draft')
+                 ORDER BY ${safeOrderBy} ${safeOrderDirection}
+                 LIMIT ? OFFSET ?`
+                , [limit, offset]);
             return flipbooks;
         }
 

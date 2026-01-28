@@ -34,7 +34,13 @@ router.get('/:flipbookId', authCheck, async (req, res) => {
 })
 
 router.get('/', authCheck, async (req, res) => {
-    const flipBooks = await Flipbook.findAll(req.query.showDrafts);
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 100, 100);
+    const offset = (page - 1) * limit;
+    const orderBy = req.query.orderBy || 'createdAt';
+    const orderDirection = req.query.orderDirection || 'DESC';
+
+    const flipBooks = await Flipbook.findAll(req.query.showDrafts, page, limit, offset, orderBy, orderDirection);
     if (!flipBooks || !flipBooks.length) {
         return res.status(404).send([]);
     }
