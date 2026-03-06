@@ -35,7 +35,7 @@ router.get('/:flipbookId', authCheck, async (req, res) => {
 
 router.get('/', authCheck, async (req, res) => {
     const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(parseInt(req.query.limit) || 100, 100);
+    const limit = Math.min(parseInt(req.query.limit) || 1000, 1000);
     const offset = (page - 1) * limit;
     const orderBy = req.query.orderBy || 'createdAt';
     const orderDirection = req.query.orderDirection || 'DESC';
