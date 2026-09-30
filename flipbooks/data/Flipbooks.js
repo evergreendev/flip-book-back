@@ -16,30 +16,27 @@ module.exports = {
 
         return flipbooks[0];
     },
-    findAll: async function (showDrafts, page, limit, offset, orderBy, orderDirection) {
+    findAll: async function (showDrafts, page = 1, limit = 1000, offset = 0, orderBy = 'created_at', orderDirection = 'DESC', title = '') {
         const validOrderColumns = ['id', 'pdf_path', 'path_name', 'status', 'password', 'title', 'cover_path', 'published_at', 'created_at', 'updated_at'];
         const validOrderDirections = ['ASC', 'DESC'];
 
         const safeOrderBy = validOrderColumns.includes(orderBy) ? orderBy : 'created_at';
         const safeOrderDirection = validOrderDirections.includes(orderDirection.toUpperCase()) ? orderDirection.toUpperCase() : 'DESC';
 
-        if (showDrafts) {
-            const [flipbooks] = await pool.query(
-                `SELECT * FROM flipbooks
-                    ORDER BY ${safeOrderBy} ${safeOrderDirection}
-                    LIMIT ? OFFSET ?`
-                , [limit, offset]);
-
-            return flipbooks;
-        } else {
-            const [flipbooks] = await pool.query(
-                `SELECT * FROM flipbooks where NOT (status = 'draft')
-                 ORDER BY ${safeOrderBy} ${safeOrderDirection}
-                 LIMIT ? OFFSET ?`
-                , [limit, offset]);
-            return flipbooks;
+        const conditions = showDrafts ? [] : ["NOT (status = 'draft')"];
+        const params = [];
+        if (title) {
+            conditions.push("title LIKE ? ESCAPE '!'");
+            params.push(`%${title.replace(/[!%_]/g, '!$&')}%`);
         }
 
+        const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        const [flipbooks] = await pool.query(
+            `SELECT * FROM flipbooks ${where}
+             ORDER BY ${safeOrderBy} ${safeOrderDirection}
+             LIMIT ? OFFSET ?`,
+            [...params, limit, offset]);
+        return flipbooks;
     },
     create: async function (flipbook) {
         if (!flipbook || !flipbook.pdfPath) return null;

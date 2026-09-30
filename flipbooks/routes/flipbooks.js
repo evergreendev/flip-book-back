@@ -39,8 +39,9 @@ router.get('/', authCheck, async (req, res) => {
     const offset = (page - 1) * limit;
     const orderBy = req.query.orderBy || 'createdAt';
     const orderDirection = req.query.orderDirection || 'DESC';
+    const title = typeof req.query.title === 'string' ? req.query.title.trim() : '';
 
-    const flipBooks = await Flipbook.findAll(req.query.showDrafts, page, limit, offset, orderBy, orderDirection);
+    const flipBooks = await Flipbook.findAll(req.query.showDrafts, page, limit, offset, orderBy, orderDirection, title);
     if (!flipBooks || !flipBooks.length) {
         return res.status(404).send([]);
     }
@@ -49,7 +50,8 @@ router.get('/', authCheck, async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    const flipBooks = await Flipbook.findAll(false);
+    const title = typeof req.query.title === 'string' ? req.query.title.trim() : '';
+    const flipBooks = await Flipbook.findAll(false, undefined, undefined, undefined, undefined, undefined, title);
     if (!flipBooks || !flipBooks.length) {
         return res.status(404).send([]);
     }
