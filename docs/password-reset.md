@@ -1,0 +1,23 @@
+# Password reset deployment and frontend handoff
+
+## Backend setup
+
+1. Run `npm install` using Node.js 20 or newer (required by the SMTP dependency).
+2. Apply `sql/migrations/20261028_password_reset_tokens.sql` to the existing database once. New databases can use the updated `sql/initDB` instead. The users table must use InnoDB for the foreign key and reset transactions.
+3. Configure the settings in `.env-sample`: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`, and `PASSWORD_RESET_URL`. The reset URL is the full frontend page URL (for example, `https://app.example.com/reset-password`); the backend appends a `token` query parameter. Use HTTPS in production. SMTP port 465 uses implicit TLS; other ports require STARTTLS. Username and password can both be omitted for an SMTP relay that does not require authentication.
+4. Restart the backend and test delivery with an existing account. The forgot-password endpoint intentionally returns the same response for unknown accounts and delivery/database failures; check server logs and the inbox during setup. Tokens and links are never returned through the API or logged.
+
+Reset links expire after 30 minutes. Only token hashes are stored. A successful reset invalidates all outstanding reset tokens for that user. Existing login JWTs and refresh tokens retain their existing expiry; this feature does not revoke those sessions. Expired reset rows are cleaned up when an existing account requests a new link.
+
+Both endpoints are public and accept JSON. A process-local limit allows 10 combined requests per socket IP per 15 minutes, then returns HTTP 429 with a `Retry-After` header in seconds. Behind a reverse proxy this can group clients under the proxy IP. Configure a trusted gateway/shared rate limiter for production and multiple backend instances. Do not simply trust arbitrary `X-Forwarded-For` values.
+
+## Instructions to give the frontend agent
+
+Implement password recovery using the existing backend API base URL and request conventions:
+
+1. Add a “Forgot password?” link on the sign-in page and a public `/forgot-password` page with an email field. Submit `POST /auth/forgot-password` with `Content-Type: application/json` and body `{"email":"person@example.com"}`. No authorization header is required. On HTTP 200 show the returned message: `If an account exists for that email, a password reset link will be sent.` Display this message without implying that the email is registered. Do not expect a token in this response.
+2. Add a public `/reset-password` page matching the backend's `PASSWORD_RESET_URL`. Read `token` from the query string, retain it only in page memory, and immediately remove it from the address bar using history replacement. Do not store it in local/session storage or send it to analytics/error trackers. Set the page's referrer policy to `no-referrer` and ensure query strings are excluded from request logging/analytics on this page. Configure hosting to serve this route directly when opened from email.
+3. Show new-password and confirm-password fields, with `autocomplete="new-password"`. Require matching values, at least 8 characters, and at most 72 UTF-8 bytes (`new TextEncoder().encode(password).length`). Do not trim or otherwise alter passwords. Disable submit while pending. If the token is missing or malformed (64 lowercase hex characters), show an invalid-link state with a link to request another email.
+4. Submit `POST /auth/reset-password` with JSON `{"token":"<token from email>","password":"<new password>"}`. No authorization header is required. HTTP 200 returns `{"message":"Password reset successfully. Please sign in with your new password."}`. Clear local authentication state and send the user to sign-in with a success notice. The endpoint does not sign the user in or return JWTs.
+5. Both endpoints return validation errors as HTTP 400 with `{"error":"..."}`. Reset returns `Invalid or expired reset link.` for an invalid, expired, or previously used token; show a request-new-link action. Password validation returns `Password must be at least 8 characters and no more than 72 UTF-8 bytes.` HTTP 429 returns `{"error":"Too many attempts. Please try again later."}`; honor `Retry-After`. HTTP 500 from reset returns `{"error":"Unable to reset password. Please try again later."}`. Handle network failures with a retry message and always restore form controls.
+6. Verify email submission, direct navigation from an emailed link, password mismatch/length validation, successful reset and sign-in with the new password, rejection of the old password, expired/reused links, rate limits, and network errors. Do not add a token-validation call: submission to `/auth/reset-password` validates and consumes the token atomically.

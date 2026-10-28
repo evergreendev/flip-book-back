@@ -150,3 +150,13 @@ create table users
     user_name varchar(255) null
 );
 
+create table password_reset_tokens
+(
+    token_hash char(64) character set ascii collate ascii_bin not null primary key,
+    user_id char(36) not null,
+    expires_at datetime not null,
+    index idx_password_reset_user (user_id),
+    index idx_password_reset_expiry (expires_at),
+    constraint password_reset_tokens_user_fk foreign key (user_id) references users (id) on delete cascade
+) engine = InnoDB;
+

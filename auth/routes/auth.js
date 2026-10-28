@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var Auth = require('../data/Auth');
 
+router.use(require('./passwordReset'));
+
 router.post('/', async function (req, res, next) {
     const tokens = await Auth.create(req.body);
 
